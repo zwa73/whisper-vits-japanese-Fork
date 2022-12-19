@@ -21,7 +21,7 @@ from util.audio_metrics import audio_metrics
 
 #传参
 #处理的目标采样率
-in_sampling_rate = sys.argv[1]
+in_sampling_rate = int(sys.argv[1])
 
 #from util.trans_numbers import translate_numbers
 
