@@ -17,6 +17,12 @@ from util.merge_transcripts_and_files import merge_transcripts_and_wav_files
 from util.clean import clean_unwanted_characters
 from util.split import split_dataset
 from util.audio_metrics import audio_metrics
+
+
+#传参
+#处理的目标采样率
+in_sampling_rate = sys.argv[1]
+
 #from util.trans_numbers import translate_numbers
 
 start_time = time.time()
@@ -70,7 +76,7 @@ for file in glob('./srt_files/*.srt'):
 print('%s-file(s) converted and saved as csv-files to ./csv' %srt_counter)
 print('---------------------------------------------------------------------')
 
-pre_process_audio(audio_path)
+pre_process_audio(audio_path,in_sampling_rate)
 print('Pre-processing of audio files is complete.')
 print('---------------------------------------------------------------------')
 

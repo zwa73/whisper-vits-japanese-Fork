@@ -5,7 +5,7 @@ import time
 import sys
 import shutil
 
-def pre_process_audio(audio_path):
+def pre_process_audio(audio_path,sampling_rate=22050):
     path_audio_processed = './ready_for_slice/'
     if not os.path.exists(path_audio_processed):
         try:
@@ -22,7 +22,7 @@ def pre_process_audio(audio_path):
         if(file.endswith('.wav')):
             try:
                 nameSolo_1 = file.rsplit('.', 1)[0]
-                data, samplerate = librosa.load(audio_path + file, sr=22050) # Downsample 44.1kHz to 24kHz
+                data, samplerate = librosa.load(audio_path + file, sr=sampling_rate) # Downsample 44.1kHz to 24kHz
                 soundfile.write(path_audio_processed + nameSolo_1 + '.wav', data, samplerate, subtype='PCM_16')
                 n = n+1
                 print('File ', n , ' completed:', nameSolo_1)
