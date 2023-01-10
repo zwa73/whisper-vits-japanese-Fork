@@ -15,7 +15,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging
 
 
-def load_checkpoint(checkpoint_path, model, optimizer=None):
+def load_checkpoint_o(checkpoint_path, model, optimizer=None):
   assert os.path.isfile(checkpoint_path)
   checkpoint_dict = torch.load(checkpoint_path, map_location='cpu')
   iteration = checkpoint_dict['iteration']
@@ -40,6 +40,48 @@ def load_checkpoint(checkpoint_path, model, optimizer=None):
     model.load_state_dict(new_state_dict)
   logger.info("Loaded checkpoint '{}' (iteration {})" .format(
     checkpoint_path, iteration))
+  return model, optimizer, learning_rate, iteration
+
+def load_checkpoint(checkpoint_path, model, optimizer=None):
+  assert os.path.isfile(checkpoint_path)
+  checkpoint_dict = torch.load(checkpoint_path, map_location='cpu')
+  iteration = checkpoint_dict['iteration']
+  learning_rate = checkpoint_dict['learning_rate']
+  if optimizer is not None:
+      optimizer.load_state_dict(checkpoint_dict['optimizer'])
+  saved_state_dict = checkpoint_dict['model']
+  if hasattr(model, 'module'):
+      state_dict = model.module.state_dict()
+  else:
+      state_dict = model.state_dict()
+  new_state_dict= {}
+  for k, v in state_dict.items():
+      if 'emb_g' in k: # 检查Embedding层
+          try:
+              new_state_dict[k] = saved_state_dict[k]
+              saved_n_speakers = new_state_dict[k].shape[0] # 获取保存的Embedding层中的说话人数量
+              if saved_n_speakers != model.n_speakers: # 比较保存的值与配置中的n_speakers
+                  # new_state_dict[k] = v # 保存的值与配置中的n_speakers不同,使用配置中的n_speakers
+                  if saved_n_speakers < model.n_speakers:
+                    diff = model.n_speakers - saved_n_speakers
+                    repeat_times = int(np.ceil(diff/saved_n_speakers))
+                    new_emb = new_state_dict[k].repeat(repeat_times, 1)
+                    new_emb = new_emb[:diff]
+                    new_state_dict[k] = torch.cat((new_state_dict[k], new_emb), dim=0)
+          except:
+              logger.info("%s is not in the checkpoint" % k)
+              new_state_dict[k] = v
+      else:
+          try:
+              new_state_dict[k] = saved_state_dict[k]
+          except:
+              logger.info("%s is not in the checkpoint" % k)
+              new_state_dict[k] = v
+  if hasattr(model, 'module'):
+      model.module.load_state_dict(new_state_dict)
+  else:
+      model.load_state_dict(new_state_dict)
+  logger.info("Loaded checkpoint '{}' (iteration {})" .format(checkpoint_path, iteration))
   return model, optimizer, learning_rate, iteration
 
 
