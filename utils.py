@@ -60,14 +60,17 @@ def load_checkpoint(checkpoint_path, model, optimizer=None):
           try:
               new_state_dict[k] = saved_state_dict[k]
               saved_n_speakers = new_state_dict[k].shape[0] # 获取保存的Embedding层中的说话人数量
-              if saved_n_speakers != model.n_speakers: # 比较保存的值与配置中的n_speakers
+              n_speakers = model.n_speakers # 获取新的配置中的Embedding层中的说话人数量
+              if saved_n_speakers != n_speakers: # 比较保存的值与配置中的n_speakers
                   # new_state_dict[k] = v # 保存的值与配置中的n_speakers不同,使用配置中的n_speakers
-                  if saved_n_speakers < model.n_speakers:
-                    diff = model.n_speakers - saved_n_speakers
+                  if saved_n_speakers < n_speakers:
+                    diff = n_speakers - saved_n_speakers
                     repeat_times = int(np.ceil(diff/saved_n_speakers))
                     new_emb = new_state_dict[k].repeat(repeat_times, 1)
                     new_emb = new_emb[:diff]
                     new_state_dict[k] = torch.cat((new_state_dict[k], new_emb), dim=0)
+                  elif saved_n_speakers > n_speakers:
+                    new_state_dict[k] = new_state_dict[k][:n_speakers]
           except:
               logger.info("%s is not in the checkpoint" % k)
               new_state_dict[k] = v
