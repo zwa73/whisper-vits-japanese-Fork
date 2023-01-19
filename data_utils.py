@@ -196,9 +196,19 @@ class TextAudioSpeakerLoader(torch.utils.data.Dataset):
         # separate filename, speaker_id and text
         audiopath, sid, text = audiopath_sid_text[0], audiopath_sid_text[1], audiopath_sid_text[2]
         text = self.get_text(text)
-        spec, wav = self.get_audio(audiopath)
-        sid = self.get_sid(sid)
-        return (text, spec, wav, sid)
+        #spec, wav = self.get_audio(audiopath)
+        #sid = self.get_sid(sid)
+        #return (text, spec, wav, sid)
+        #抛异
+        try:
+            spec, wav = self.get_audio(audiopath)
+            sid = self.get_sid(sid)
+            return (text, spec, wav, sid)
+        except Exception as e:
+            print(audiopath)
+            spec, wav = self.get_audio(audiopath)
+            sid = self.get_sid(sid)
+            return (text, spec, wav, sid)
 
     def get_audio(self, filename):
         audio, sampling_rate = load_wav_to_torch(filename)
