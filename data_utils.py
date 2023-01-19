@@ -205,6 +205,7 @@ class TextAudioSpeakerLoader(torch.utils.data.Dataset):
             sid = self.get_sid(sid)
             return (text, spec, wav, sid)
         except Exception as e:
+            print("一个错误的音频")
             print(audiopath)
             spec, wav = self.get_audio(audiopath)
             sid = self.get_sid(sid)
