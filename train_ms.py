@@ -40,6 +40,8 @@ from text.symbols import symbols
 
 
 torch.backends.cudnn.benchmark = True
+
+# 初始化时+1避免重复训练
 global_step = 0
 
 # 默认为8但系统提示应为4 报错
