@@ -42,6 +42,8 @@ from text.symbols import symbols
 torch.backends.cudnn.benchmark = True
 global_step = 0
 
+# 默认为8但系统提示应为4 报错
+data_loader_num = 4
 
 def main():
   """Assume Single Node Multi GPUs Training Only"""
