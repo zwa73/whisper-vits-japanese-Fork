@@ -119,6 +119,9 @@ def run(rank, n_gpus, hps):
   scheduler_g = torch.optim.lr_scheduler.ExponentialLR(optim_g, gamma=hps.train.lr_decay, last_epoch=epoch_str-2)
   scheduler_d = torch.optim.lr_scheduler.ExponentialLR(optim_d, gamma=hps.train.lr_decay, last_epoch=epoch_str-2)
 
+  # optim_g.param_groups[0]['lr'] = 0.0001
+  # optim_d.param_groups[0]['lr'] = 0.0001
+
   scaler = GradScaler(enabled=hps.train.fp16_run)
 
   for epoch in range(epoch_str, hps.train.epochs + 1):
